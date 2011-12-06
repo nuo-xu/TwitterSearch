@@ -58,7 +58,7 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
 	SearchViewController *searchTable = [[SearchViewController alloc] initWithStyle:UITableViewStylePlain];
-    searchTable.query = [textField text];
+    searchTable.containing = [textField text];
     [textField resignFirstResponder];
     [[self navigationController] pushViewController:searchTable animated:YES];
     textField.text = @"";
@@ -69,7 +69,8 @@
 - (void)goToAdvanceSearch:(id)sender{
     AdvanceSearchViewController *advanceSearchView = [[AdvanceSearchViewController alloc] initWithStyle:UITableViewStylePlain];
     if ([self.searchPattern text]) {
-        advanceSearchView.containing = [self.searchPattern text];
+        advanceSearchView.containingField.text = [self.searchPattern text];
+//        advanceSearchView.containingField
     }
     [self.navigationController pushViewController:advanceSearchView animated:YES];
     [advanceSearchView release];

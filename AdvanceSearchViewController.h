@@ -8,18 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AdvanceSearchViewController : UITableViewController <UITextFieldDelegate>{
-    UITextField *containingField, *notContainingField, *mentioningField, *fromField, *toField, *untillField, *sinceField;
+@interface AdvanceSearchViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>{
+    UITextField *containingField, *notContainingField, *mentioningField, *fromField, *untillField, *sinceField;
 }
 
-
+@property (nonatomic, retain) IBOutlet UITextField *containingField, *notContainingField, *mentioningField, *fromField, *untillField, *sinceField;
 @property (nonatomic, retain) NSString *containing;
 @property (nonatomic, retain) NSString *notContaining;
 @property (nonatomic, retain) NSString *mentioning;
 @property (nonatomic, retain) NSString *from;
-@property (nonatomic, retain) NSString *to;
 @property (nonatomic, retain) NSString *untill;
 @property (nonatomic, retain) NSString *since;
-@property (nonatomic, retain) UITextField *containingField, *notContainingField, *mentioningField, *fromField, *toField, *untillField, *sinceField;
+
+- (void)goToSearchView;
 
 @end

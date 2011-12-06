@@ -7,25 +7,25 @@
 //
 
 #import "AdvanceSearchViewController.h"
+#import "SearchViewController.h"
 
 @implementation AdvanceSearchViewController
-@synthesize containing, notContaining, mentioning, from, to, since, untill, containingField, notContainingField, mentioningField, fromField, toField, untillField, sinceField;;
+
+@synthesize containingField, notContainingField, mentioningField, fromField, untillField, sinceField, containing, notContaining, mentioning, from, untill, since;
 
 - (void)dealloc {
-    [containing release];
-    [notContaining release];
-    [mentioning release];
-    [from release];
-    [to release];
-    [since release];
-    [untill release];
     [containingField release];
     [notContainingField release];
     [mentioningField release];
     [fromField release];
-    [toField release];
     [sinceField release];
     [untillField release];
+    [containing release];
+    [notContaining release];
+    [mentioning release];
+    [from release];
+    [untill release];
+    [since release];
     [super dealloc];
 }
 
@@ -33,13 +33,6 @@
 {
     self = [super initWithStyle:style];
     if (self) {
-        self.containing = nil;
-        self.notContaining = nil;
-        self.mentioning = nil;
-        self.from = nil;
-        self.to = nil;
-        self.since = nil;
-        self.untill = nil;
     }
     return self;
 }
@@ -58,12 +51,11 @@
 {
     [super viewDidLoad];
     containingField.delegate = self;
-//    notContainingField.delegate = self;
-//    mentioningField.delegate = self;
-//    fromField.delegate = self;
-//    toField.delegate = self;
-//    sinceField.delegate = self;
-//    untillField.delegate = self;
+    notContainingField.delegate = self;
+    mentioningField.delegate = self;
+    fromField.delegate = self;
+    sinceField.delegate = self;
+    untillField.delegate = self;
 }
 
 - (void)viewDidUnload
@@ -108,20 +100,22 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 7;
+    return 6;
 }
+
 - (void)createTextField:(UITextField *)textField {
     textField.adjustsFontSizeToFitWidth = YES;
     textField.keyboardType = UIKeyboardTypeDefault;
     textField.autocorrectionType = UITextAutocorrectionTypeYes;
     textField.textAlignment = UITextAlignmentLeft;
     textField.clearButtonMode = UITextFieldViewModeNever;
+    textField.returnKeyType = UIReturnKeyNext;
     [textField setEnabled:YES];
-//    [textField addTarget:self action:@selector(textFieldFinished:textField:) forControlEvents:UIControlEventEditingDidEndOnExit];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cellIdentifier"];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cellIdentifier"] autorelease];
@@ -129,26 +123,21 @@
         if ([indexPath section] == 0) {
             cell.textLabel.numberOfLines = 2;
             cell.textLabel.font = [UIFont boldSystemFontOfSize:12];
-//            if ([indexPath row] == 6) {
-//                searchTextField.returnKeyType = UIReturnKeySearch;
-//            } else {
-//                searchTextField.returnKeyType = UIReturnKeyDefault;
-//            }
             switch ([indexPath row]) {
                 case 0:
                     self.containingField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
                     [self createTextField: self.containingField];
                     cell.textLabel.text = @"Containing:";
                     self.containingField.placeholder = @"Bieber:";
-                    self.containingField.tag = 0;
-                    [cell addSubview:containingField];
+                    [self.containingField addTarget:self action:@selector(containingFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
+                    [cell addSubview:containingField];  
                     break;
                 case 1:
                     self.notContainingField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
                     [self createTextField: self.notContainingField];
                     cell.textLabel.text = @"Not\nContaining:";
                     self.notContainingField.placeholder = @"Justin:";
-                    self.notContainingField.tag = 1;
+                    [self.notContainingField addTarget:self action:@selector(notContainingFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
                     [cell addSubview:notContainingField];
                     break;
                 case 2:
@@ -156,7 +145,7 @@
                     [self createTextField: self.mentioningField];
                     cell.textLabel.text = @"Mentioning:";
                     self.mentioningField.placeholder = @"Christmas:";
-                    self.mentioningField.tag = 2;
+                    [self.mentioningField addTarget:self action:@selector(mentioningFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
                     [cell addSubview:mentioningField];
                     break;
                 case 3:
@@ -164,31 +153,24 @@
                     [self createTextField: self.fromField];
                     cell.textLabel.text = @"From:";
                     self.fromField.placeholder = @"Usher:";
-                    self.fromField.tag = 3;
+                    [self.fromField addTarget:self action:@selector(fromFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
                     [cell addSubview:fromField];
                     break;
                 case 4:
-                    self.toField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
-                    [self createTextField: self.toField];
-                    cell.textLabel.text = @"To:";
-                    self.toField.placeholder = @"Justin:";
-                    self.toField.tag = 4;
-                    [cell addSubview:toField];
-                    break;
-                case 5:
                     self.sinceField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
                     [self createTextField: self.sinceField];
                     cell.textLabel.text = @"Since:";
                     self.sinceField.placeholder = @"yyyy-mm-dd:";
-                    self.sinceField.tag = 5;
+                    [self.sinceField addTarget:self action:@selector(sinceFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
                     [cell addSubview:sinceField];
                     break;
-                case 6:
+                case 5:
                     self.untillField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
                     [self createTextField: self.untillField];
                     cell.textLabel.text = @"Untill:";
                     self.untillField.placeholder = @"yyyy-mm-dd:";   
-                    self.untillField.tag = 6;
+                    [self.untillField addTarget:self action:@selector(untillFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];
+                    self.untillField.returnKeyType = UIReturnKeyNext;
                     [cell addSubview:untillField];
                 default:
                     break;
@@ -199,38 +181,36 @@
     return cell;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    [textField resignFirstResponder];
-    switch (textField.tag) {
-        case 0:
-            self.containing = [textField text];
-            break;
-        case 1:
-            self.notContaining = [textField text];
-            break;
-        case 2:
-            self.mentioning = [textField text];
-            break;
-        case 3:
-            self.from = [textField text];
-            break;
-        case 4:
-            self.to = [textField text];
-            break;
-        case 5:
-            self.since = [textField text];
-            break;
-        case 6:
-            self.untill = [textField text];
-            break;
-        default:
-            break;
-    }
-
-    return YES;
+- (void)containingFinished: (id)sender {
+    [self.notContainingField becomeFirstResponder];
+    self.containing = [self.containingField text];
 }
 
+- (void)notContainingFinished: (id)sender {
+    [self.mentioningField becomeFirstResponder];
+    self.notContaining = [self.notContainingField text];
+}
+
+- (void)mentioningFinished: (id)sender {
+    [self.fromField becomeFirstResponder];
+    self.mentioning = [self.mentioningField text];
+}
+
+- (void)fromFinished: (id)sender {
+    [self.sinceField becomeFirstResponder];
+    self.from = [self.fromField text];
+}
+
+- (void)sinceFinished: (id)sender {
+    [self.untillField becomeFirstResponder];
+    self.since = [self.sinceField text];
+}
+
+- (void)untillFinished: (id)sender {
+    self.untill = [self.untillField text];
+    [self goToSearchView];
+    NSLog([NSString stringWithFormat:@"containing: %@\n not containing: %@\n mentioning: %@", self.containing, self.notContaining, self.mentioning]);
+}
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -241,57 +221,12 @@
         cell.backgroundColor = [UIColor whiteColor];
     }
 }
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
+- (void)goToSearchView {
+    SearchViewController *searchViewTable = [[SearchViewController alloc] initWithStyle:UITableViewStylePlain];
+    [searchViewTable updateContainingString:self.containing andNotContainingString:self.notContaining andMentioningString:self.mentioning andFromString:self.from andSinceString:self.since andUntillString:self.untill];
+    [self.navigationController pushViewController:searchViewTable animated:YES];
+    [searchViewTable release];
 }
 
 @end

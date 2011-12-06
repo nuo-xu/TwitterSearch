@@ -17,11 +17,17 @@
 
 @implementation SearchViewController
 
-@synthesize query, buffer, connection, results, textPull, textRelease, textLoading, lastTimeUpdate, refreshHeaderView, refreshLabel, refreshSpinner;
+@synthesize containing, notContaining, mentioning, from, since, untill, buffer, connection, results, textPull, textRelease, textLoading, lastTimeUpdate, refreshHeaderView, refreshLabel, refreshSpinner;
 
 - (void)dealloc
 {
-    self.query = nil;
+    self.containing = nil;
+    self.containing = nil;
+    self.notContaining = nil;
+    self.mentioning = nil;
+    self.from = nil;
+    self.since = nil;
+    self.untill = nil;
     self.buffer = nil;
     self.connection = nil;
     self.results = nil;
@@ -41,6 +47,13 @@
     self = [super initWithStyle:style];
     if (self) {
         isFirstRefresh = YES;
+        self.containing = @"";
+        self.containing = @"";
+        self.notContaining = @"";
+        self.mentioning = @"";
+        self.from = @"";
+        self.since = @"";
+        self.untill = @"";
         [self setupStrings];
     }
     return self;
@@ -56,7 +69,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title = self.query;
+    self.title = self.containing;
     [self loadQuery];
     [self addPullToRefreshHeader];
 //    [self addLoadFooter];
@@ -191,13 +204,22 @@
 
 }
 
+- (void)updateContainingString: (NSString *)containingString andNotContainingString: (NSString *)notContainingString andMentioningString: (NSString *)mentioningString andFromString: (NSString *)fromString andSinceString: (NSString *)sinceString andUntillString: (NSString *)untillString {
+    self.containing = containingString;
+    self.notContaining = [NSString stringWithFormat:@"%%%d%@%@", 20, @"-", notContainingString];
+//    NSLog(self.notContaining);
+    self.mentioning = [NSString stringWithFormat:@"%@@%@",@"%20", mentioningString];
+    self.from = fromString;
+    self.since = sinceString;
+    self.untill = untillString;
+}
 
 #define RESULTS_PERPAGE 40
 
 - (void)loadQuery {
-    
-    NSString *path = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=%d&q=%@",
-                      RESULTS_PERPAGE,self.query];
+    // @"http://search.twitter.com/search.json?rpp=%d&q=%@%20-%@%20from:%@%20since:%@%20untill:%@"
+    NSString *path = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=%d&q=%@%@", RESULTS_PERPAGE, self.containing, self.notContaining];//self.from, self.since, self.untill];
+//    NSLog(path);
     path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:path]];
     self.connection = [[[NSURLConnection alloc] initWithRequest:request delegate:self] autorelease];    

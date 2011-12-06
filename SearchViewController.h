@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface SearchViewController : UITableViewController{
-    NSString *query;
+    NSString *containing, *notContaining, *mentioning, *from, *since, *untill;
     UIView *refreshHeaderView;
     UIView *loadFooterView;
     UILabel *refreshLabel;
@@ -26,7 +26,7 @@
 //    NSInteger *numberOfCurrentRows;
 }
 
-@property (nonatomic, retain) NSString *query;
+@property (nonatomic, retain) NSString *containing, *notContaining, *mentioning, *from, *since, *untill;
 @property (nonatomic, retain) NSMutableData *buffer;
 @property (nonatomic, retain) NSURLConnection *connection;
 @property (nonatomic, retain) NSMutableArray *results;
@@ -51,4 +51,5 @@
 - (void)stopLoading;
 - (void)refresh;
 //- (void)loadTenMore;
+- (void)updateContainingString: (NSString *)containingString andNotContainingString: (NSString *)notContainingString andMentioningString: (NSString *)mentioningString andFromString: (NSString *)fromString andSinceString: (NSString *)sinceString andUntillString: (NSString *)untillString;
 @end
