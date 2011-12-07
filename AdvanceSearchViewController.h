@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AdvanceSearchViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>{
+@interface AdvanceSearchViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIAlertViewDelegate>{
     UITextField *containingField, *notContainingField, *mentioningField, *fromField, *untillField, *sinceField;
 }
 

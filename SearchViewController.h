@@ -26,7 +26,7 @@
 //    NSInteger *numberOfCurrentRows;
 }
 
-@property (nonatomic, retain) NSString *containing, *notContaining, *mentioning, *from, *since, *untill;
+@property (nonatomic, retain) NSString *containing, *notContaining, *mentioning, *from, *since, *untill, *minusSign, *atSign, *sinceColon, *fromColon, *untillColon;
 @property (nonatomic, retain) NSMutableData *buffer;
 @property (nonatomic, retain) NSURLConnection *connection;
 @property (nonatomic, retain) NSMutableArray *results;

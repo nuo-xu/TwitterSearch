@@ -10,6 +10,20 @@
 #import "SBJSON.h"
 #import "DetailViewController.h"
 
+@interface NSString (URLEncoding)
+-(NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding;
+@end
+
+@implementation NSString (URLEncoding)
+-(NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding {
+	return (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                               (CFStringRef)self,
+                                                               NULL,
+                                                               (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
+                                                               CFStringConvertNSStringEncodingToEncoding(encoding));
+}
+@end
+
 @interface SearchViewController ()
 - (void)loadQuery;
 - (void)handleError:(NSError *)error;
@@ -17,7 +31,7 @@
 
 @implementation SearchViewController
 
-@synthesize containing, notContaining, mentioning, from, since, untill, buffer, connection, results, textPull, textRelease, textLoading, lastTimeUpdate, refreshHeaderView, refreshLabel, refreshSpinner;
+@synthesize containing, notContaining, mentioning, from, since, untill, buffer, connection, results, textPull, textRelease, textLoading, lastTimeUpdate, refreshHeaderView, refreshLabel, refreshSpinner, minusSign, atSign, sinceColon, fromColon, untillColon;
 
 - (void)dealloc
 {
@@ -38,6 +52,11 @@
     self.refreshLabel = nil;
     self.refreshSpinner = nil;
     self.lastTimeUpdate = nil;
+    self.minusSign = nil;
+    self.atSign = nil;
+    self.sinceColon = nil;
+    self.fromColon = nil;
+    self.untillColon = nil;
 //    self.numberOfCurrentRows = nil;
     [super dealloc];
 }
@@ -54,6 +73,11 @@
         self.from = @"";
         self.since = @"";
         self.untill = @"";
+        self.minusSign = @"";
+        self.atSign = @"";
+        self.fromColon = @"";
+        self.sinceColon = @"";
+        self.untillColon = @"";
         [self setupStrings];
     }
     return self;
@@ -205,23 +229,53 @@
 }
 
 - (void)updateContainingString: (NSString *)containingString andNotContainingString: (NSString *)notContainingString andMentioningString: (NSString *)mentioningString andFromString: (NSString *)fromString andSinceString: (NSString *)sinceString andUntillString: (NSString *)untillString {
+    if (self.mentioning != @"") {
+        self.atSign = @"@";
+    }
+    if (self.notContaining != @"") {
+        self.minusSign = @"-";
+    }
+    if (self.from != @"") {
+        self.fromColon = @"from:";
+    }
+    if (self.since != @"") {
+        self.sinceColon = @"since:";
+    }
+    if (self.untill != @"") {
+        self.untillColon = @"untill:";
+    }
     self.containing = containingString;
-    self.notContaining = [NSString stringWithFormat:@"%%%d%@%@", 20, @"-", notContainingString];
-//    NSLog(self.notContaining);
-    self.mentioning = [NSString stringWithFormat:@"%@@%@",@"%20", mentioningString];
-    self.from = fromString;
-    self.since = sinceString;
-    self.untill = untillString;
+    self.notContaining = [NSString stringWithFormat:@" %@ ", notContainingString];
+    self.mentioning = [NSString stringWithFormat:@"%@ ", mentioningString];
+    self.from = [NSString stringWithFormat:@"%@ ", fromString];
+    self.since = [NSString stringWithFormat:@"%@ ", sinceString];
+    self.untill = [NSString stringWithFormat:@"%@", untillString];
+    NSLog(@"containing: %@\notcontaining: %@\nmentioning: %@\nfrom: %@\nsince: %@\nuntill: %@", self.containing, self.notContaining, self.mentioning, self.from, self.since, self.untill);
+    self.notContaining = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.notContaining, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
+    self.mentioning = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.mentioning, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
+    self.from = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.from, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
+    self.since = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.since, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
+    self.untill = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.untill, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
 }
 
 #define RESULTS_PERPAGE 40
 
-- (void)loadQuery {
+- (void)loadQuery {    
+    NSString *path = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=%d&q=%@", RESULTS_PERPAGE, self.containing];
+    NSString *url = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@", path, self.minusSign, self.notContaining, self.atSign, self.mentioning, self.fromColon, self.from, self.sinceColon, self.since, self.untillColon, self.untill];
+    NSLog(@"url: %@", url);
+    
+//    NSString *escapeColumSignOne = [self.from stringByAddingRFC3875PercentEscapesUsingEncoding:
+//                                 NSUTF8StringEncoding];
+//    NSString *escapeColumSignTwo = [self.since stringByAddingRFC3875PercentEscapesUsingEncoding:
+//                 NSUTF8StringEncoding];
+//    NSString *escapeColumSignThree = [self.untill stringByAddingRFC3875PercentEscapesUsingEncoding:
+//                 NSUTF8StringEncoding];
     // @"http://search.twitter.com/search.json?rpp=%d&q=%@%20-%@%20from:%@%20since:%@%20untill:%@"
-    NSString *path = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=%d&q=%@%@", RESULTS_PERPAGE, self.containing, self.notContaining];//self.from, self.since, self.untill];
-//    NSLog(path);
-    path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:path]];
+//    path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//    NSString *urlString = [path stringByAddingRFC3875PercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//    NSLog(urlString);
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
     self.connection = [[[NSURLConnection alloc] initWithRequest:request delegate:self] autorelease];    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
