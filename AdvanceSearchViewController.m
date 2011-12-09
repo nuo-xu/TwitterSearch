@@ -242,18 +242,17 @@
 }
 
 - (void)goToSearchView {
-    self.containing = [self.containingField text];
-    if (self.containing != @"") {
-        NSLog(@"containing: %@**********", self.containing);
+    if ([self.containing isEqualToString:@""]) {
+        UIAlertView *missingRequest = [[UIAlertView alloc] initWithTitle:@"Missing Request" message:@"Please input search pattern!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [missingRequest show];
+        [self.containingField becomeFirstResponder];
+        [missingRequest release];        
+    } else {
+        NSLog(@"containing:%@**********", self.containing);
         SearchViewController *searchViewTable = [[SearchViewController alloc] initWithStyle:UITableViewStylePlain];
         [searchViewTable updateContainingString:self.containing andNotContainingString:self.notContaining andMentioningString:self.mentioning andFromString:self.from andSinceString:self.since andUntillString:self.untill];
         [self.navigationController pushViewController:searchViewTable animated:YES];
         [searchViewTable release];
-    } else {
-        UIAlertView *missingRequest = [[UIAlertView alloc] initWithTitle:@"Missing Request" message:@"Please input search pattern!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [missingRequest show];
-        [self.containingField becomeFirstResponder];
-        [missingRequest release];
     }
 }
 

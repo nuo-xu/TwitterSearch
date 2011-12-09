@@ -60,10 +60,19 @@
 	SearchViewController *searchTable = [[SearchViewController alloc] initWithStyle:UITableViewStylePlain];
     searchTable.containing = [textField text];
     [textField resignFirstResponder];
-    [[self navigationController] pushViewController:searchTable animated:YES];
-    textField.text = @"";
-    [searchTable release];
-	return YES;
+    if ([searchTable.containing isEqualToString:@""]) {
+        UIAlertView *missingRequest = [[UIAlertView alloc] initWithTitle:@"Missing Request" message:@"Please input search pattern!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [missingRequest show];
+        //        [self.containingField becomeFirstResponder];
+        [missingRequest release];  
+        [textField becomeFirstResponder];
+        return NO;
+    } else {
+        [[self navigationController] pushViewController:searchTable animated:YES];
+        textField.text = @"";
+        [searchTable release];
+        return YES;
+    }
 }
 
 - (void)goToAdvanceSearch:(id)sender{

@@ -229,27 +229,27 @@
 }
 
 - (void)updateContainingString: (NSString *)containingString andNotContainingString: (NSString *)notContainingString andMentioningString: (NSString *)mentioningString andFromString: (NSString *)fromString andSinceString: (NSString *)sinceString andUntillString: (NSString *)untillString {
-    if (self.mentioning != @"") {
-        self.atSign = @"@";
-    }
-    if (self.notContaining != @"") {
+    if (![notContainingString isEqualToString:@""]) {
         self.minusSign = @"-";
     }
-    if (self.from != @"") {
+    if (![mentioningString isEqualToString:@""]) {
+        self.atSign = @"@";
+    }
+    if (![fromString isEqualToString:@""]) {
         self.fromColon = @"from:";
     }
-    if (self.since != @"") {
+    if (![sinceString isEqualToString:@""]) {
         self.sinceColon = @"since:";
     }
-    if (self.untill != @"") {
+    if (![untillString isEqualToString:@""]) {
         self.untillColon = @"untill:";
     }
     self.containing = containingString;
-    self.notContaining = [NSString stringWithFormat:@" %@ ", notContainingString];
+    self.notContaining = [NSString stringWithFormat:@" -%@ ", notContainingString];
     self.mentioning = [NSString stringWithFormat:@"%@ ", mentioningString];
     self.from = [NSString stringWithFormat:@"%@ ", fromString];
     self.since = [NSString stringWithFormat:@"%@ ", sinceString];
-    self.untill = [NSString stringWithFormat:@"%@", untillString];
+    self.untill = [NSString stringWithFormat:@"%@ ", untillString];
     NSLog(@"containing: %@\notcontaining: %@\nmentioning: %@\nfrom: %@\nsince: %@\nuntill: %@", self.containing, self.notContaining, self.mentioning, self.from, self.since, self.untill);
     self.notContaining = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.notContaining, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
     self.mentioning = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)self.mentioning, NULL, (CFStringRef)@"!’\"();:@&=+$,/?%#[]% ", kCFStringEncodingISOLatin1);
@@ -262,19 +262,9 @@
 
 - (void)loadQuery {    
     NSString *path = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=%d&q=%@", RESULTS_PERPAGE, self.containing];
-    NSString *url = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@", path, self.minusSign, self.notContaining, self.atSign, self.mentioning, self.fromColon, self.from, self.sinceColon, self.since, self.untillColon, self.untill];
+    NSString *url = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@", path, self.notContaining, self.atSign, self.mentioning, self.fromColon, self.from, self.sinceColon, self.since, self.untillColon, self.untill];
     NSLog(@"url: %@", url);
     
-//    NSString *escapeColumSignOne = [self.from stringByAddingRFC3875PercentEscapesUsingEncoding:
-//                                 NSUTF8StringEncoding];
-//    NSString *escapeColumSignTwo = [self.since stringByAddingRFC3875PercentEscapesUsingEncoding:
-//                 NSUTF8StringEncoding];
-//    NSString *escapeColumSignThree = [self.untill stringByAddingRFC3875PercentEscapesUsingEncoding:
-//                 NSUTF8StringEncoding];
-    // @"http://search.twitter.com/search.json?rpp=%d&q=%@%20-%@%20from:%@%20since:%@%20untill:%@"
-//    path = [path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-//    NSString *urlString = [path stringByAddingRFC3875PercentEscapesUsingEncoding:NSUTF8StringEncoding];
-//    NSLog(urlString);
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
     self.connection = [[[NSURLConnection alloc] initWithRequest:request delegate:self] autorelease];    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
