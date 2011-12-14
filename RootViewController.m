@@ -35,7 +35,9 @@
 - (void)viewDidLoad
 {
     [super viewDidUnload];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"aberthol512_twitter_ugly_bird.png"]];
     UILabel *rootLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 300, 40)];
+    rootLabel.backgroundColor = [UIColor clearColor];
     rootLabel.textAlignment = UITextAlignmentCenter;
     rootLabel.text = @"Input search pattern";
     [self.view addSubview:rootLabel];
